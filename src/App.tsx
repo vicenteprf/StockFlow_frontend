@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Private } from "./components/ProtectedRoute.tsx";
 import LoginPage from "./pages/login.tsx";
 import CadastroPage from "./pages/cadastro.tsx";
+import { AuthCallback } from "./pages/authCallback.tsx";
 import HomePage from "./pages/home.tsx";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/cadastro" element={<CadastroPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route element={<Private autorizado={user.logado} />}>
           <Route path="/home" element={<HomePage />} />
         </Route>
