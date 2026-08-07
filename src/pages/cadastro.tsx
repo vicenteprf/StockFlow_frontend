@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MdArrowBack } from "react-icons/md";
-import { FcGoogle } from "react-icons/fc";
 import { api } from "../services/api";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import BotaoGoogleLogin from "../components/BotaoGoogle.tsx";
 
 export default function CadastroPage() {
   const [dados, setDados] = useState({
@@ -94,13 +94,7 @@ export default function CadastroPage() {
               pessoas depois.
             </h2>
 
-            <button
-              type="button"
-              className="w-full py-3 px-4 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition cursor-pointer shadow-xs"
-            >
-              <FcGoogle size={20} />
-              Cadastrar com Google
-            </button>
+            <BotaoGoogleLogin texto="Cadastrar com o Google" />
           </div>
 
           <div className="w-full flex items-center gap-3">

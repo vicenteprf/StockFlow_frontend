@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
 import { FiLock } from "react-icons/fi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { api } from "../services/api";
-
 import axios from "axios";
-
 import toast, { Toaster } from "react-hot-toast";
+import BotaoGoogleLogin from "../components/BotaoGoogle.tsx";
 
 export default function LoginPage() {
   const [dados, setDados] = useState({
@@ -64,8 +62,6 @@ export default function LoginPage() {
     }
   }
 
-  async function HandleGoogleLogin() {}
-
   return (
     <main className="min-h-screen bg-[#f4f7fc] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm flex flex-col items-center text-center gap-5">
@@ -83,14 +79,7 @@ export default function LoginPage() {
           </p>
         </div>
         {/* Botão Google */}
-        <button
-          type="button"
-          onClick={HandleGoogleLogin}
-          className="w-full py-3 px-4 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition cursor-pointer"
-        >
-          <FcGoogle size={20} />
-          Entrar com Google
-        </button>
+        <BotaoGoogleLogin />
         {/* Divisor */}
         <div className="w-full flex items-center gap-3">
           <div className="h-px flex-1 bg-slate-200"></div>
