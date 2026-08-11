@@ -6,6 +6,7 @@ import { api } from "../services/api";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import BotaoGoogleLogin from "../components/BotaoGoogle.tsx";
+import SubmitButton from "../components/SubmitBotao.tsx";
 
 export default function LoginPage() {
   const [dados, setDados] = useState({
@@ -137,12 +138,7 @@ export default function LoginPage() {
               Esqueceu a senha?
             </Link>
           </div>
-          <button
-            type="submit"
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition active:scale-[0.98] cursor-pointer shadow-sm"
-          >
-            Entrar
-          </button>
+          <SubmitButton>Entrar</SubmitButton>
         </form>
         {/* Rodapé */}
         <footer className="mt-2">
