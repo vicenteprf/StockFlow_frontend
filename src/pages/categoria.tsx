@@ -11,6 +11,7 @@ interface Categoria {
 
 export default function CategoriaPage() {
   const [dados, setDados] = useState<string>("");
+  const [editarCategoria, setEditarCategoria] = useState<number | null>(null);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -49,12 +50,26 @@ export default function CategoriaPage() {
     }
 
     try {
-      const response = await api.post("/categoria", { nome: dados });
+      if (editarCategoria) {
+        const response = await api.put(`/categoria/${editarCategoria}`, {
+          nome: dados,
+        });
 
-      toast.success("Categoria cadastrada com sucesso!");
+        setCategorias((prev) =>
+          prev.map((cat) => (cat.id === editarCategoria ? response.data : cat)),
+        );
 
-      setCategorias((prev) => [...prev, response.data]);
-      setDados("");
+        toast.success("Categoria atualizada com sucesso!");
+        setDados("");
+        setEditarCategoria(null);
+      } else {
+        const response = await api.post("/categoria", { nome: dados });
+
+        toast.success("Categoria cadastrada com sucesso!");
+
+        setCategorias((prev) => [...prev, response.data]);
+        setDados("");
+      }
     } catch (e) {
       if (axios.isAxiosError(e)) {
         const errorMessage =
@@ -64,6 +79,11 @@ export default function CategoriaPage() {
         return;
       }
     }
+  }
+
+  function handleEditar(categoria: Categoria) {
+    setEditarCategoria(categoria.id);
+    setDados(categoria.nome);
   }
 
   async function handleDeletar(id: number) {
@@ -93,12 +113,6 @@ export default function CategoriaPage() {
             onSubmit={handleSubmit}
             className="w-full text-left space-y-4 bg-blue-50/90 p-6"
           >
-            <div className="flex flex-col gap-4">
-              <h2 className="text-xs font-medium text-slate-600">
-                O código é gerado e fica permanente para esta categoria.
-              </h2>
-            </div>
-
             <div>
               <label className="mb-1.5 block text-xs font-medium text-slate-600">
                 Categoria
@@ -118,7 +132,7 @@ export default function CategoriaPage() {
               type="submit"
               className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition active:scale-[0.98] cursor-pointer shadow-sm"
             >
-              Cadastrar
+              {editarCategoria ? "Salvar" : "Cadastrar"}
             </button>
           </form>
         </div>
@@ -149,6 +163,7 @@ export default function CategoriaPage() {
 
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => handleEditar(categoria)}
                       type="button"
                       className="px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition cursor-pointer"
                     >
