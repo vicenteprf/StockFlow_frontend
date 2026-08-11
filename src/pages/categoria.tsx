@@ -3,6 +3,7 @@ import { api } from "../services/api.ts";
 import axios from "axios";
 import Header from "../components/Header.tsx";
 import toast, { Toaster } from "react-hot-toast";
+import SubmitButton from "../components/SubmitBotao.tsx";
 
 interface Categoria {
   id: number;
@@ -128,12 +129,9 @@ export default function CategoriaPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition active:scale-[0.98] cursor-pointer shadow-sm"
-            >
+            <SubmitButton>
               {editarCategoria ? "Salvar" : "Cadastrar"}
-            </button>
+            </SubmitButton>
           </form>
         </div>
 
