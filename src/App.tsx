@@ -5,6 +5,7 @@ import CadastroPage from "./pages/cadastro.tsx";
 import { AuthCallback } from "./pages/authCallback.tsx";
 import HomePage from "./pages/home.tsx";
 import CategoriaPage from "./pages/categoria.tsx";
+import ProdutoPage from "./pages/produto.tsx";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route element={<Private />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/categoria" element={<CategoriaPage />} />
+          <Route path="/produto" element={<ProdutoPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
