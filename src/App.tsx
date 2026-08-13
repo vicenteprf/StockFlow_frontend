@@ -6,6 +6,7 @@ import { AuthCallback } from "./pages/authCallback.tsx";
 import HomePage from "./pages/home.tsx";
 import CategoriaPage from "./pages/categoria.tsx";
 import ProdutoPage from "./pages/produto.tsx";
+import EntradaPage from "./pages/entrada.tsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/categoria" element={<CategoriaPage />} />
           <Route path="/produto" element={<ProdutoPage />} />
+          <Route path="/entrada" element={<EntradaPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
