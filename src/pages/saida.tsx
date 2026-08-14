@@ -101,10 +101,14 @@ export default function SaidaPage() {
         produtoId: Number(dados.produtoId),
         quantidade: Number(dados.quantidade),
         tipo: "SAIDA",
+        motivo: dados.motivo.trim() ? dados.motivo : undefined,
+        observacao: dados.observacao.trim() ? dados.observacao : undefined,
       };
 
       await api.post("/movimentacao", payload);
       toast.success("Saída registrada com sucesso!");
+
+      setProdutos((prev) => prev.map((p) => p.id === Number(dados.produtoId) ? {...p, quantidadeEstoque: p.quantidadeEstoque - Number(dados.quantidade)} : p))
 
       setDados({
         produtoId: "",
@@ -162,7 +166,7 @@ export default function SaidaPage() {
             <div className="flex flex-col gap-1 rounded-2xl bg-slate-100/50 p-3 border border-slate-400/60">
               <span className="text-slate-400 text-xs">
                 {produtoSelecionado
-                  ? ` ${
+                  ? `${produtoSelecionado.codigo || `PRD-${produtoSelecionado.id}`} ${
                       produtoSelecionado.categoria?.nome
                         ? `· ${produtoSelecionado.categoria.nome}`
                         : ""
