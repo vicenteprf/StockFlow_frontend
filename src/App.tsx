@@ -8,6 +8,7 @@ import CategoriaPage from "./pages/categoria.tsx";
 import ProdutoPage from "./pages/produto.tsx";
 import EntradaPage from "./pages/entrada.tsx";
 import SaidaPage from "./pages/saida.tsx";
+import EstoquePage from "./pages/estoque.tsx";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/produto" element={<ProdutoPage />} />
           <Route path="/entrada" element={<EntradaPage />} />
           <Route path="/saida" element={<SaidaPage />} />
+          <Route path="/estoque" element={<EstoquePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

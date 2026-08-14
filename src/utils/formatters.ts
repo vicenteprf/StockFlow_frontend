@@ -10,3 +10,9 @@ export function formatarMoedaInput(value: string) {
     currency: "BRL",
   }).format(valorNumerico);
 }
+
+export function formatarValidade(validade?: string | Date) {
+  if (!validade) return "Val: N/A";
+  const data = new Date(validade);
+  return `Val: ${data.toLocaleDateString("pt-BR")}`;
+}
