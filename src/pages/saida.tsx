@@ -4,14 +4,7 @@ import { api } from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import Header from "../components/Header";
 import SubmitButton from "../components/SubmitBotao";
-
-interface Produto {
-  id: number;
-  nome: string;
-  codigo?: string;
-  categoria?: { nome: string };
-  quantidadeEstoque: number;
-}
+import type { Produto } from "../types";
 
 export default function SaidaPage() {
   const [dados, setDados] = useState({
@@ -25,26 +18,26 @@ export default function SaidaPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let active = true;
+    let ativo = true;
 
     async function carregarProdutos() {
       try {
         const response = await api.get("/produto");
-        if (active && response.data) {
+        if (ativo && response.data) {
           setProdutos(response.data);
         }
       } catch (e) {
         console.error("Erro ao carregar produtos:", e);
         toast.error("Erro ao carregar lista de produtos.");
       } finally {
-        if (active) setLoading(false);
+        if (ativo) setLoading(false);
       }
     }
 
     carregarProdutos();
 
     return () => {
-      active = false;
+      ativo = false;
     };
   }, []);
 
@@ -108,7 +101,17 @@ export default function SaidaPage() {
       await api.post("/movimentacao", payload);
       toast.success("Saída registrada com sucesso!");
 
-      setProdutos((prev) => prev.map((p) => p.id === Number(dados.produtoId) ? {...p, quantidadeEstoque: p.quantidadeEstoque - Number(dados.quantidade)} : p))
+      setProdutos((prev) =>
+        prev.map((p) =>
+          p.id === Number(dados.produtoId)
+            ? {
+                ...p,
+                quantidadeEstoque:
+                  p.quantidadeEstoque - Number(dados.quantidade),
+              }
+            : p,
+        ),
+      );
 
       setDados({
         produtoId: "",

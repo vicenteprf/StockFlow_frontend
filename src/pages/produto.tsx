@@ -4,12 +4,8 @@ import { api } from "../services/api.ts";
 import axios from "axios";
 import Header from "../components/Header.tsx";
 import SubmitButton from "../components/SubmitBotao.tsx";
+import type { Categoria } from "../types";
 import toast, { Toaster } from "react-hot-toast";
-
-interface Categoria {
-  id: number;
-  nome: string;
-}
 
 export default function ProdutoPage() {
   const [dados, setDados] = useState({
@@ -22,26 +18,26 @@ export default function ProdutoPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let active = true;
+    let ativo = true;
 
     async function carregarCategoria() {
       try {
         const response = await api.get("/categoria");
-        if (active && response.data) {
+        if (ativo && response.data) {
           setCategoria(response.data);
         }
       } catch (e) {
         console.error("Erro ao carregar categorias:", e);
         toast.error("Erro ao carregar lista de categorias.");
       } finally {
-        if (active) setLoading(false);
+        if (ativo) setLoading(false);
       }
     }
 
     carregarCategoria();
 
     return () => {
-      active = false;
+      ativo = false;
     };
   }, []);
 

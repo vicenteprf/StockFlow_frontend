@@ -4,11 +4,7 @@ import axios from "axios";
 import Header from "../components/Header.tsx";
 import toast, { Toaster } from "react-hot-toast";
 import SubmitButton from "../components/SubmitBotao.tsx";
-
-interface Categoria {
-  id: number;
-  nome: string;
-}
+import type { Categoria } from "../types";
 
 export default function CategoriaPage() {
   const [dados, setDados] = useState<string>("");
@@ -17,12 +13,12 @@ export default function CategoriaPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let active = true;
+    let ativo = true;
 
     async function carregarCategoria() {
       try {
         const response = await api.get("/categoria");
-        if (active && response.data) {
+        if (ativo && response.data) {
           setCategorias(response.data);
         }
       } catch (error) {
@@ -34,7 +30,7 @@ export default function CategoriaPage() {
     carregarCategoria();
 
     return () => {
-      active = false;
+      ativo = false;
     };
   }, []);
 

@@ -25,26 +25,26 @@ export default function EntradaPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let active = true;
+    let ativo = true;
 
     async function carregarProdutos() {
       try {
         const response = await api.get("/produto");
-        if (active && response.data) {
+        if (ativo && response.data) {
           setProdutos(response.data);
         }
       } catch (e) {
         console.error("Erro ao carregar produtos:", e);
         toast.error("Erro ao carregar lista de produtos.");
       } finally {
-        if (active) setLoading(false);
+        if (ativo) setLoading(false);
       }
     }
 
     carregarProdutos();
 
     return () => {
-      active = false;
+      ativo = false;
     };
   }, []);
 

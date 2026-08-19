@@ -3,23 +3,8 @@ import { api } from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import ScrollContainer from "react-indiana-drag-scroll";
 import Header from "../components/Header";
+import type { Produto, Categoria } from "../types";
 import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
-
-interface Categoria {
-  id: number;
-  nome: string;
-}
-
-interface Produto {
-  id: number;
-  codigo: number;
-  nome: string;
-  descricao?: string;
-  categoriaId: number;
-  categoria?: { id: number; nome: string };
-  quantidadeEstoque: number;
-  validade: string | null;
-}
 
 export default function EstoquePage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -31,7 +16,7 @@ export default function EstoquePage() {
   >(null);
 
   useEffect(() => {
-    let active = true;
+    let ativo = true;
 
     async function carregarDados() {
       try {
@@ -41,7 +26,7 @@ export default function EstoquePage() {
           api.get("/produto"),
         ]);
 
-        if (active) {
+        if (ativo) {
           if (resCategorias.data) setCategorias(resCategorias.data);
           if (resProdutos.data) setProdutos(resProdutos.data);
         }
@@ -49,14 +34,14 @@ export default function EstoquePage() {
         console.error("Erro ao carregar dados:", e);
         toast.error("Erro ao carregar estoque.");
       } finally {
-        if (active) setCarregando(false);
+        if (ativo) setCarregando(false);
       }
     }
 
     carregarDados();
 
     return () => {
-      active = false;
+      ativo = false;
     };
   }, []);
 
