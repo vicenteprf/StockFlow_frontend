@@ -38,24 +38,27 @@ export default function HistoricoPage() {
     };
   }, []);
 
-  const movimentacoesFiltradas = movimentacoes.filter((mov) => {
-    const atendeFiltro = filtro === "TODOS" || mov.tipo === filtro;
-
-    const termo = busca.toLowerCase();
-    const codigoFormatado = String(mov.produto?.codigo || "").padStart(3, "0");
-
-    const atendeBusca =
-      mov.produto?.nome?.toLowerCase().includes(termo) ||
-      String(mov.produto?.codigo || "").includes(termo) ||
-      codigoFormatado.includes(termo);
-
-    return atendeFiltro && atendeBusca;
-  });
-
   const movimentacoesAgrupadas = useMemo(() => {
+    const filtradas = movimentacoes.filter((mov) => {
+      const atendeFiltro = filtro === "TODOS" || mov.tipo === filtro;
+
+      const termo = busca.toLowerCase();
+      const codigoFormatado = String(mov.produto?.codigo || "").padStart(
+        3,
+        "0",
+      );
+
+      const atendeBusca =
+        mov.produto?.nome?.toLowerCase().includes(termo) ||
+        String(mov.produto?.codigo || "").includes(termo) ||
+        codigoFormatado.includes(termo);
+
+      return atendeFiltro && atendeBusca;
+    });
+
     const grupos: { [chaveData: string]: Movimentacao[] } = {};
 
-    movimentacoesFiltradas.forEach((mov) => {
+    filtradas.forEach((mov) => {
       const dataChave = mov.criado
         ? format(parseISO(mov.criado), "yyyy-MM-dd")
         : "sem-data";
@@ -67,7 +70,7 @@ export default function HistoricoPage() {
     });
 
     return grupos;
-  }, [movimentacoesFiltradas]);
+  }, [movimentacoes, filtro, busca]);
 
   const formatarCabecalhoData = (dataIsoString: string) => {
     if (dataIsoString === "sem-data") return "OUTROS REGISTROS";
