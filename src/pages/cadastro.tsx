@@ -46,16 +46,14 @@ export default function CadastroPage() {
 
       if (token) {
         localStorage.setItem("token", token);
+        setDados({
+          nome: "",
+          empresa: "",
+          email: "",
+          password: "",
+        });
+        navigate("/home");
       }
-
-      setDados({
-        nome: "",
-        empresa: "",
-        email: "",
-        password: "",
-      });
-
-      navigate("/home");
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         const errorMessage =
