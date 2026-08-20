@@ -5,6 +5,7 @@ import ScrollContainer from "react-indiana-drag-scroll";
 import Header from "../components/Header";
 import type { Produto, Categoria } from "../types";
 import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
+import BottomNav from "../components/BottomNav";
 
 export default function EstoquePage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -269,6 +270,7 @@ export default function EstoquePage() {
           </div>
         </div>
       </main>
+      <BottomNav />
       <Toaster />
     </div>
   );

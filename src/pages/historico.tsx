@@ -6,6 +6,7 @@ import type { Movimentacao } from "../types";
 import toast, { Toaster } from "react-hot-toast";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import BottomNav from "../components/BottomNav";
 
 export default function HistoricoPage() {
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
@@ -274,6 +275,7 @@ export default function HistoricoPage() {
           </div>
         </div>
       </main>
+      <BottomNav />
       <Toaster />
     </div>
   );
