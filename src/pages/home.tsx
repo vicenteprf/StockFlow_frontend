@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../services/api.ts";
 import {
-  FiBell,
   FiArrowDown,
   FiPlusSquare,
   FiHexagon,
@@ -11,6 +10,7 @@ import {
   FiGrid,
   FiAlertTriangle,
   FiLoader,
+  FiLogOut,
 } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 import BottomNav from "../components/BottomNav";
@@ -81,6 +81,13 @@ export default function HomePage() {
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [carregando, setCarregando] = useState<boolean>(true);
 
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/");
+  }
+
   useEffect(() => {
     let ativo = true;
 
@@ -133,7 +140,7 @@ export default function HomePage() {
   const saudacao = getSaudacao();
 
   const usuario = useMemo(() => getUsuarioDoToken(), []);
-  const { nome, inicial } = usuario;
+  const { nome } = usuario;
 
   const limiteSeteDias = subDays(hoje, 7);
 
@@ -142,7 +149,6 @@ export default function HomePage() {
 
     const dataMov = parseISO(mov.criado);
 
-    // Soma a quantidade apenas se a movimentação ocorreu nos últimos 7 dias
     if (isAfter(dataMov, limiteSeteDias)) {
       return acc + (mov.quantidade || 0);
     }
@@ -155,15 +161,14 @@ export default function HomePage() {
       (mov) => mov.produto?.id === prod.id && mov.preco !== null,
     );
 
-    const precoUniratio = movComPreco?.preco || 0;
+    const precoUnitario = movComPreco?.preco || 0;
     const quantidade = prod.quantidadeEstoque || 0;
 
-    return acc + quantidade * precoUniratio;
+    return acc + quantidade * precoUnitario;
   }, 0);
 
   return (
     <div className="min-h-screen bg-[#f4f7fc] flex flex-col">
-      {/* Header Fixo/Superior */}
       <header className="w-full flex flex-row items-center justify-between p-6 pb-4 bg-white border-b border-slate-100">
         <div>
           <h1 className="text-2xl font-bold text-blue-600 tracking-tight">
@@ -175,20 +180,17 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-row items-center gap-3">
-          <button className="relative flex items-center justify-center w-10 h-10 bg-slate-100/70 rounded-2xl hover:bg-slate-200/60 transition-colors cursor-pointer">
-            <FiBell size={20} className="text-slate-600" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full" />
-          </button>
-
-          <button className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-600 font-semibold text-sm rounded-full hover:bg-blue-200 transition-colors cursor-pointer">
-            {inicial}
+          <button
+            onClick={handleLogout}
+            title="Sair da conta"
+            className="flex items-center justify-center w-10 h-10 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition-colors cursor-pointer"
+          >
+            <FiLogOut size={18} />
           </button>
         </div>
       </header>
 
-      {/* Conteúdo Principal Estático */}
       <main className="flex-1 flex flex-col gap-6 px-4 py-6 pb-24 max-w-md mx-auto w-full">
-        {/* Métricas do Topo */}
         {carregando ? (
           <div className="flex-1 flex flex-col items-center justify-center min-h-75 gap-2">
             <FiLoader size={32} className="text-blue-600 animate-spin" />
@@ -226,7 +228,7 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            {/* Card de Alerta de Vencimento */}
+
             {totalVencendo > 0 && (
               <div className="w-full bg-amber-50/70 border border-amber-200/80 p-4 rounded-2xl flex items-center gap-3">
                 <FiAlertTriangle
@@ -242,14 +244,13 @@ export default function HomePage() {
                 </p>
               </div>
             )}
-            {/* Grade de Acesso Rápido */}
+
             <div className="w-full flex flex-col gap-3">
               <p className="text-xs text-slate-400 uppercase font-medium tracking-wider">
                 acesso rápido
               </p>
 
               <div className="w-full grid grid-cols-2 gap-3">
-                {/* Botão 1: Entrada */}
                 <Link
                   to={"/entrada"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
@@ -265,7 +266,6 @@ export default function HomePage() {
                   </p>
                 </Link>
 
-                {/* Botão 2: Cadastro */}
                 <Link
                   to={"/produto"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
@@ -281,7 +281,6 @@ export default function HomePage() {
                   </p>
                 </Link>
 
-                {/* Botão 3: Estoque */}
                 <Link
                   to={"/estoque"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
@@ -297,7 +296,6 @@ export default function HomePage() {
                   </p>
                 </Link>
 
-                {/* Botão 4: Saída */}
                 <Link
                   to={"/saida"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
@@ -313,7 +311,6 @@ export default function HomePage() {
                   </p>
                 </Link>
 
-                {/* Botão 5: Histórico */}
                 <Link
                   to={"/historico"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
@@ -329,7 +326,6 @@ export default function HomePage() {
                   </p>
                 </Link>
 
-                {/* Botão 6: Dashboard */}
                 <Link
                   to={"/dashboard"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
@@ -346,7 +342,7 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-            {/* Lista de Últimas Movimentações */}
+
             <div className="w-full flex flex-col gap-3">
               <p className="text-xs text-slate-400 uppercase font-medium tracking-wider">
                 últimas movimentações
@@ -362,7 +358,9 @@ export default function HomePage() {
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`rounded-xl p-2.5 ${entrada ? "bg-green-50" : "bg-red-50"}`}
+                          className={`rounded-xl p-2.5 ${
+                            entrada ? "bg-green-50" : "bg-red-50"
+                          }`}
                         >
                           {entrada ? (
                             <FiArrowDown size={18} className="text-green-600" />
@@ -372,10 +370,10 @@ export default function HomePage() {
                         </div>
 
                         <div>
-                          <h3 className="text-xs font-semibold ">
+                          <h3 className="text-xs font-semibold">
                             {mov.produto?.nome}
                           </h3>
-                          <p className={`text-xs text-slate-400 `}>
+                          <p className="text-xs text-slate-400">
                             {entrada ? "Entrada" : "Saída"} · {mov.quantidade}{" "}
                             unid.
                           </p>
@@ -383,7 +381,9 @@ export default function HomePage() {
                       </div>
                       <div className="text-right">
                         <span
-                          className={`text-sm font-semibold block ${entrada ? "text-green-600" : "text-red-600"}`}
+                          className={`text-sm font-semibold block ${
+                            entrada ? "text-green-600" : "text-red-600"
+                          }`}
                         >
                           {entrada
                             ? `+${mov.quantidade}`
