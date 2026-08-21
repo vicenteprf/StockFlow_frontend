@@ -6,7 +6,7 @@ import {
   FiPlusSquare,
   FiHexagon,
   FiArrowUp,
-  FiClock,
+  FiTag,
   FiGrid,
   FiAlertTriangle,
   FiLoader,
@@ -267,36 +267,6 @@ export default function HomePage() {
                 </Link>
 
                 <Link
-                  to={"/produto"}
-                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-                >
-                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                    <FiPlusSquare size={20} className="text-blue-600" />
-                  </div>
-                  <h2 className="text-sm text-slate-900 font-semibold">
-                    Cadastro
-                  </h2>
-                  <p className="text-xs text-slate-400 font-normal">
-                    Novo produto
-                  </p>
-                </Link>
-
-                <Link
-                  to={"/estoque"}
-                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-                >
-                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                    <FiHexagon size={20} className="text-blue-600" />
-                  </div>
-                  <h2 className="text-sm text-slate-900 font-semibold">
-                    Estoque
-                  </h2>
-                  <p className="text-xs text-slate-400 font-normal">
-                    Ver quantidades
-                  </p>
-                </Link>
-
-                <Link
                   to={"/saida"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
                 >
@@ -312,17 +282,47 @@ export default function HomePage() {
                 </Link>
 
                 <Link
-                  to={"/historico"}
+                  to={"/produto"}
                   className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
                 >
                   <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                    <FiClock size={20} className="text-blue-600" />
+                    <FiPlusSquare size={20} className="text-blue-600" />
                   </div>
                   <h2 className="text-sm text-slate-900 font-semibold">
-                    Histórico
+                    Cadastro
                   </h2>
                   <p className="text-xs text-slate-400 font-normal">
-                    Movimentações
+                    Novo produto
+                  </p>
+                </Link>
+
+                <Link
+                  to={"/categoria"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
+                >
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiTag size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Categoria
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Nova categoria
+                  </p>
+                </Link>
+
+                <Link
+                  to={"/estoque"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
+                >
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiHexagon size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Estoque
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Ver quantidades
                   </p>
                 </Link>
 
