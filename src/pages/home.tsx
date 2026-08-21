@@ -10,6 +10,7 @@ import {
   FiClock,
   FiGrid,
   FiAlertTriangle,
+  FiLoader,
 } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 import BottomNav from "../components/BottomNav";
@@ -188,191 +189,218 @@ export default function HomePage() {
       {/* Conteúdo Principal Estático */}
       <main className="flex-1 flex flex-col gap-6 px-4 py-6 pb-24 max-w-md mx-auto w-full">
         {/* Métricas do Topo */}
-        <div className="w-full grid grid-cols-2 gap-4">
-          <div className="flex flex-col justify-center items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm">
-            <p className="text-xs text-slate-400 uppercase font-medium">
-              itens em estoque
-            </p>
-            <h1 className="text-2xl text-slate-900 font-bold">
-              {totalProdutos}
-            </h1>
-            <p className="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5">
-              <span>↑</span> {entradasEstaSemana} esta semana
+        {carregando ? (
+          <div className="flex-1 flex flex-col items-center justify-center min-h-75 gap-2">
+            <FiLoader size={32} className="text-blue-600 animate-spin" />
+            <p className="text-xs text-slate-400 font-medium">
+              Carregando dados...
             </p>
           </div>
-
-          <div className="flex flex-col justify-center items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm">
-            <p className="text-xs text-slate-400 uppercase font-medium">
-              valor total
-            </p>
-            <h1 className="text-2xl text-slate-900 font-bold">
-              {new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(valorTotalEstoque)}
-            </h1>
-            <p className="text-[10px] text-slate-400 font-medium">
-              estimativa baseada na última entrada
-            </p>
-          </div>
-        </div>
-        {/* Card de Alerta de Vencimento */}
-        {totalVencendo > 0 && (
-          <div className="w-full bg-amber-50/70 border border-amber-200/80 p-4 rounded-2xl flex items-center gap-3">
-            <FiAlertTriangle size={20} className="text-amber-600 shrink-0" />
-            <p className="text-amber-800 text-xs leading-relaxed">
-              <span className="text-amber-700 font-bold">
-                {totalVencendo} {totalVencendo === 1 ? "produto" : "produtos"}
-              </span>
-              com validade próxima ao vencimento.
-            </p>
-          </div>
-        )}
-        {/* Grade de Acesso Rápido */}
-        <div className="w-full flex flex-col gap-3">
-          <p className="text-xs text-slate-400 uppercase font-medium tracking-wider">
-            acesso rápido
-          </p>
-
-          <div className="w-full grid grid-cols-2 gap-3">
-            {/* Botão 1: Entrada */}
-            <Link
-              to={"/entrada"}
-              className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-            >
-              <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                <FiArrowDown size={20} className="text-blue-600" />
+        ) : (
+          <>
+            <div className="w-full grid grid-cols-2 gap-4">
+              <div className="flex flex-col justify-center items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm">
+                <p className="text-xs text-slate-400 uppercase font-medium">
+                  itens em estoque
+                </p>
+                <h1 className="text-2xl text-slate-900 font-bold">
+                  {totalProdutos}
+                </h1>
+                <p className="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5">
+                  <span>↑</span> {entradasEstaSemana} esta semana
+                </p>
               </div>
-              <h2 className="text-sm text-slate-900 font-semibold">Entrada</h2>
-              <p className="text-xs text-slate-400 font-normal">
-                Registrar chegada
+
+              <div className="flex flex-col justify-center items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm">
+                <p className="text-xs text-slate-400 uppercase font-medium">
+                  valor total
+                </p>
+                <h1 className="text-2xl text-slate-900 font-bold">
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(valorTotalEstoque)}
+                </h1>
+                <p className="text-[10px] text-slate-400 font-medium">
+                  estimativa baseada na última entrada
+                </p>
+              </div>
+            </div>
+            {/* Card de Alerta de Vencimento */}
+            {totalVencendo > 0 && (
+              <div className="w-full bg-amber-50/70 border border-amber-200/80 p-4 rounded-2xl flex items-center gap-3">
+                <FiAlertTriangle
+                  size={20}
+                  className="text-amber-600 shrink-0"
+                />
+                <p className="text-amber-800 text-xs leading-relaxed">
+                  <span className="text-amber-700 font-bold">
+                    {totalVencendo}{" "}
+                    {totalVencendo === 1 ? "produto" : "produtos"}
+                  </span>{" "}
+                  com validade próxima ao vencimento.
+                </p>
+              </div>
+            )}
+            {/* Grade de Acesso Rápido */}
+            <div className="w-full flex flex-col gap-3">
+              <p className="text-xs text-slate-400 uppercase font-medium tracking-wider">
+                acesso rápido
               </p>
-            </Link>
 
-            {/* Botão 2: Cadastro */}
-            <Link
-              to={"/produto"}
-              className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-            >
-              <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                <FiPlusSquare size={20} className="text-blue-600" />
-              </div>
-              <h2 className="text-sm text-slate-900 font-semibold">Cadastro</h2>
-              <p className="text-xs text-slate-400 font-normal">Novo produto</p>
-            </Link>
-
-            {/* Botão 3: Estoque */}
-            <Link
-              to={"/estoque"}
-              className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-            >
-              <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                <FiHexagon size={20} className="text-blue-600" />
-              </div>
-              <h2 className="text-sm text-slate-900 font-semibold">Estoque</h2>
-              <p className="text-xs text-slate-400 font-normal">
-                Ver quantidades
-              </p>
-            </Link>
-
-            {/* Botão 4: Saída */}
-            <Link
-              to={"/saida"}
-              className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-            >
-              <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                <FiArrowUp size={20} className="text-blue-600" />
-              </div>
-              <h2 className="text-sm text-slate-900 font-semibold">Saída</h2>
-              <p className="text-xs text-slate-400 font-normal">
-                Registrar saída
-              </p>
-            </Link>
-
-            {/* Botão 5: Histórico */}
-            <Link
-              to={"/historico"}
-              className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-            >
-              <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                <FiClock size={20} className="text-blue-600" />
-              </div>
-              <h2 className="text-sm text-slate-900 font-semibold">
-                Histórico
-              </h2>
-              <p className="text-xs text-slate-400 font-normal">
-                Movimentações
-              </p>
-            </Link>
-
-            {/* Botão 6: Dashboard */}
-            <Link
-              to={"/dashboard"}
-              className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
-            >
-              <div className="bg-blue-50 p-2 rounded-xl mb-1">
-                <FiGrid size={20} className="text-blue-600" />
-              </div>
-              <h2 className="text-sm text-slate-900 font-semibold">
-                Dashboard
-              </h2>
-              <p className="text-xs text-slate-400 font-normal">
-                Gastos do mês
-              </p>
-            </Link>
-          </div>
-        </div>
-        {/* Lista de Últimas Movimentações */}
-        <div className="w-full flex flex-col gap-3">
-          <p className="text-xs text-slate-400 uppercase font-medium tracking-wider">
-            últimas movimentações
-          </p>
-
-          <div className="w-full bg-white rounded-2xl border border-slate-100 divide-y divide-slate-100 shadow-sm overflow-hidden">
-            {ultimasMovimentacoes.map((mov) => {
-              const entrada = mov.tipo === "ENTRADA";
-              return (
-                <div
-                  key={mov.id}
-                  className="flex items-center justify-between p-4"
+              <div className="w-full grid grid-cols-2 gap-3">
+                {/* Botão 1: Entrada */}
+                <Link
+                  to={"/entrada"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiArrowDown size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Entrada
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Registrar chegada
+                  </p>
+                </Link>
+
+                {/* Botão 2: Cadastro */}
+                <Link
+                  to={"/produto"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
+                >
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiPlusSquare size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Cadastro
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Novo produto
+                  </p>
+                </Link>
+
+                {/* Botão 3: Estoque */}
+                <Link
+                  to={"/estoque"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
+                >
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiHexagon size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Estoque
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Ver quantidades
+                  </p>
+                </Link>
+
+                {/* Botão 4: Saída */}
+                <Link
+                  to={"/saida"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
+                >
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiArrowUp size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Saída
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Registrar saída
+                  </p>
+                </Link>
+
+                {/* Botão 5: Histórico */}
+                <Link
+                  to={"/historico"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
+                >
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiClock size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Histórico
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Movimentações
+                  </p>
+                </Link>
+
+                {/* Botão 6: Dashboard */}
+                <Link
+                  to={"/dashboard"}
+                  className="flex flex-col items-start gap-1 bg-white p-4 border border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 hover:shadow-md transition cursor-pointer text-left"
+                >
+                  <div className="bg-blue-50 p-2 rounded-xl mb-1">
+                    <FiGrid size={20} className="text-blue-600" />
+                  </div>
+                  <h2 className="text-sm text-slate-900 font-semibold">
+                    Dashboard
+                  </h2>
+                  <p className="text-xs text-slate-400 font-normal">
+                    Gastos do mês
+                  </p>
+                </Link>
+              </div>
+            </div>
+            {/* Lista de Últimas Movimentações */}
+            <div className="w-full flex flex-col gap-3">
+              <p className="text-xs text-slate-400 uppercase font-medium tracking-wider">
+                últimas movimentações
+              </p>
+
+              <div className="w-full bg-white rounded-2xl border border-slate-100 divide-y divide-slate-100 shadow-sm overflow-hidden">
+                {ultimasMovimentacoes.map((mov) => {
+                  const entrada = mov.tipo === "ENTRADA";
+                  return (
                     <div
-                      className={`rounded-xl p-2.5 ${entrada ? "bg-green-50" : "bg-red-50"}`}
+                      key={mov.id}
+                      className="flex items-center justify-between p-4"
                     >
-                      {entrada ? (
-                        <FiArrowDown size={18} className="text-green-600" />
-                      ) : (
-                        <FiArrowUp size={18} className="text-red-600" />
-                      )}
-                    </div>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`rounded-xl p-2.5 ${entrada ? "bg-green-50" : "bg-red-50"}`}
+                        >
+                          {entrada ? (
+                            <FiArrowDown size={18} className="text-green-600" />
+                          ) : (
+                            <FiArrowUp size={18} className="text-red-600" />
+                          )}
+                        </div>
 
-                    <div>
-                      <h3 className="text-xs font-semibold ">
-                        {mov.produto?.nome}
-                      </h3>
-                      <p className={`text-xs text-slate-400 `}>
-                        {entrada ? "Entrada" : "Saída"} · {mov.quantidade} unid.
-                      </p>
+                        <div>
+                          <h3 className="text-xs font-semibold ">
+                            {mov.produto?.nome}
+                          </h3>
+                          <p className={`text-xs text-slate-400 `}>
+                            {entrada ? "Entrada" : "Saída"} · {mov.quantidade}{" "}
+                            unid.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span
+                          className={`text-sm font-semibold block ${entrada ? "text-green-600" : "text-red-600"}`}
+                        >
+                          {entrada
+                            ? `+${mov.quantidade}`
+                            : `-${mov.quantidade}`}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          {formatarDataMovimentacao(mov.criado)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <span
-                      className={`text-sm font-semibold block ${entrada ? "text-green-600" : "text-red-600"}`}
-                    >
-                      {entrada ? `+${mov.quantidade}` : `-${mov.quantidade}`}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      {formatarDataMovimentacao(mov.criado)}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
       </main>
-
       <BottomNav />
       <Toaster />
     </div>
