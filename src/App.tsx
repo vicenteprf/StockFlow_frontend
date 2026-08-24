@@ -10,6 +10,7 @@ import EntradaPage from "./pages/entrada.tsx";
 import SaidaPage from "./pages/saida.tsx";
 import EstoquePage from "./pages/estoque.tsx";
 import HistoricoPage from "./pages/historico.tsx";
+import DashboardPage from "./pages/dashboard.tsx";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/saida" element={<SaidaPage />} />
           <Route path="/estoque" element={<EstoquePage />} />
           <Route path="/historico" element={<HistoricoPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
