@@ -38,10 +38,14 @@ export default function LoginPage() {
     try {
       const response = await api.post("/auth", dados);
 
-      const token = response.data.token;
+      const { token, usuario } = response.data;
 
       if (token) {
         localStorage.setItem("token", token);
+      }
+
+      if (usuario) {
+        localStorage.setItem("@StockFlow:user", JSON.stringify(usuario));
       }
 
       setDados({

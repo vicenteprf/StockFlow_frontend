@@ -27,3 +27,34 @@ export interface Movimentacao {
     nome: string;
   };
 }
+
+export interface DashboardStats {
+  entradasValor: number;
+  entradasPercentual: number;
+  saidasValor: number;
+  saidasPercentual: number;
+  entradasQtd: number;
+  saidasQtd: number;
+}
+
+export interface ChartItem {
+  mes: string;
+  valor: number;
+  ativo: boolean;
+}
+
+export interface CategoriaGasto {
+  categoriaId: number;
+  nome: string;
+  valorTotal: number;
+  porcentagem: number;
+}
+
+type Role = "USER" | "ADMIN";
+
+export interface Usuario {
+  id: number;
+  nome: string;
+  email?: string;
+  role?: Role;
+}
