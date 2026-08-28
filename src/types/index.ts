@@ -25,6 +25,7 @@ export interface Movimentacao {
     id: number;
     codigo: number;
     nome: string;
+    categoriaId: number;
   };
 }
 
