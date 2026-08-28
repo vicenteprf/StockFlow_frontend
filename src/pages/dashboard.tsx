@@ -3,7 +3,7 @@ import { api } from "../services/api";
 import axios from "axios";
 import { ResponsiveContainer, BarChart, Bar, XAxis, Cell } from "recharts";
 import BottomNav from "../components/BottomNav";
-import type { Movimentacao, Usuario } from "../types";
+import type { Categoria, Movimentacao, Usuario } from "../types";
 import toast, { Toaster } from "react-hot-toast";
 import { FiLoader } from "react-icons/fi";
 import { format, parseISO } from "date-fns";
@@ -26,6 +26,7 @@ export default function DashboardPage() {
     password: "",
   });
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [carregando, setCarregando] = useState<boolean>(true);
   const [loading, setLoading] = useState(false);
   const [mesAnoSelecionado, setMesAnoSelecionado] = useState<string>("");
@@ -49,13 +50,15 @@ export default function DashboardPage() {
       try {
         setCarregando(true);
 
-        const [resUsuario, resMovimentacao] = await Promise.all([
+        const [resUsuario, resMovimentacao, resCategoria] = await Promise.all([
           api.get("/usuario"),
           api.get("/movimentacao"),
+          api.get("/categoria"),
         ]);
         if (ativo) {
           if (resUsuario) setEquipe(resUsuario.data);
           if (resMovimentacao) setMovimentacoes(resMovimentacao.data);
+          if (resCategoria) setCategorias(resCategoria.data);
         }
       } catch (e) {
         console.error("Erro ao carregar dados:", e);
@@ -217,6 +220,36 @@ export default function DashboardPage() {
       };
     });
 
+  const categoriaMap = new Map<number, string>(
+    categorias.map((cat) => [cat.id, cat.nome]),
+  );
+
+  const categoriasGastoMap = movimentacoesFiltradas
+    .filter((mov) => mov.tipo === "ENTRADA")
+    .reduce((acc, mov) => {
+      const categoriaId = mov.produto?.categoriaId;
+
+      const nomeCategoria =
+        (categoriaId ? categoriaMap.get(categoriaId) : null) || "Sem categoria";
+
+      const preco = mov.preco ? Number(mov.preco) : 0;
+      const quantidade = mov.quantidade || 1;
+      const valorMovimentacao = preco * quantidade;
+
+      const valorAtual = acc.get(nomeCategoria) || 0;
+      acc.set(nomeCategoria, valorAtual + valorMovimentacao);
+
+      return acc;
+    }, new Map<string, number>());
+
+  const categoriasMaisGastaram = Array.from(categoriasGastoMap.entries())
+    .map(([nome, valor]) => {
+      const porcentagem =
+        totalEntrada > 0 ? Math.round((valor / totalEntrada) * 100) : 0;
+      return { nome, valor, porcentagem };
+    })
+    .sort((a, b) => b.valor - a.valor);
+
   return (
     <div className="min-h-screen bg-[#f4f7fc] flex flex-col">
       <header className="w-full flex flex-row justify-between items-center p-6 pb-4 bg-white border-b border-slate-100">
@@ -259,8 +292,8 @@ export default function DashboardPage() {
                     minimumFractionDigits: 2,
                   })}
                 </h1>
-                <p className="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5">
-                  <span>↑</span>18% vs Dez
+                <p className="text-[10px] text-slate-400 font-medium">
+                  acumulado no período
                 </p>
               </div>
 
@@ -274,8 +307,8 @@ export default function DashboardPage() {
                     minimumFractionDigits: 2,
                   })}
                 </h1>
-                <p className="text-[10px] text-red-400 font-medium">
-                  <span>↓</span> 5% vs Dez
+                <p className="text-[10px] text-slate-400 font-medium">
+                  acumulado no período
                 </p>
               </div>
 
@@ -348,57 +381,34 @@ export default function DashboardPage() {
               </p>
 
               <div className="w-full bg-white rounded-2xl border border-slate-100 divide-y divide-slate-100 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between p-4">
-                  <div className="w-full flex flex-row justify-between items-center">
-                    <p className="text-sm font-semibold">Alimentos secos</p>
+                {categoriasMaisGastaram.length === 0 ? (
+                  <p className="p-4 text-xs text-slate-400 text-center">
+                    Nenhuma entrada registrada para este mês.
+                  </p>
+                ) : (
+                  categoriasMaisGastaram.map((cat) => (
+                    <div
+                      key={cat.nome}
+                      className="flex items-center justify-between p-4"
+                    >
+                      <div className="w-full flex flex-row justify-between items-center">
+                        <p className="text-sm font-semibold">{cat.nome}</p>
 
-                    <div className="flex flex-col justify-center items-end">
-                      <p className="text-sm font-semibold">R$ 412</p>
-                      <p className="text-xs text-slate-400 uppercase font-medium">
-                        46%
-                      </p>
+                        <div className="flex flex-col justify-center items-end">
+                          <p className="text-sm font-semibold">
+                            R${" "}
+                            {cat.valor.toLocaleString("pt-BR", {
+                              minimumFractionDigits: 2,
+                            })}
+                          </p>
+                          <p className="text-xs text-slate-400 uppercase font-medium">
+                            {cat.porcentagem}%
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4">
-                  <div className="w-full flex flex-row justify-between items-center">
-                    <p className="text-sm font-semibold">Bebidas</p>
-
-                    <div className="flex flex-col justify-center items-end">
-                      <p className="text-sm font-semibold">R$ 218</p>
-                      <p className="text-xs text-slate-400 uppercase font-medium">
-                        24%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4">
-                  <div className="w-full flex flex-row justify-between items-center">
-                    <p className="text-sm font-semibold">Limpeza</p>
-
-                    <div className="flex flex-col justify-center items-end">
-                      <p className="text-sm font-semibold">R$ 156</p>
-                      <p className="text-xs text-slate-400 uppercase font-medium">
-                        18%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4">
-                  <div className="w-full flex flex-row justify-between items-center">
-                    <p className="text-sm font-semibold">Higiene pessoal</p>
-
-                    <div className="flex flex-col justify-center items-end">
-                      <p className="text-sm font-semibold">R$ 106</p>
-                      <p className="text-xs text-slate-400 uppercase font-medium">
-                        12%
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  ))
+                )}
               </div>
             </div>
 
