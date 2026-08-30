@@ -250,6 +250,22 @@ export default function DashboardPage() {
     })
     .sort((a, b) => b.valor - a.valor);
 
+  const token = localStorage.getItem("token");
+  let usuarioLogadoId: number | null = null;
+
+  if (token) {
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const payloadDecodificado = JSON.parse(atob(payloadBase64));
+      usuarioLogadoId = payloadDecodificado.id;
+    } catch (e) {
+      console.error("Erro ao decodificar token:", e);
+    }
+  }
+
+  const usuarioLogado = equipe.find((u) => u.id === usuarioLogadoId);
+  const eUsuarioLogadoAdmin = usuarioLogado?.role === "ADMIN";
+
   return (
     <div className="min-h-screen bg-[#f4f7fc] flex flex-col">
       <header className="w-full flex flex-row justify-between items-center p-6 pb-4 bg-white border-b border-slate-100">
@@ -474,53 +490,56 @@ export default function DashboardPage() {
                             </p>
                           </div>
 
-                          {!eAdminMembro && (
-                            <button
-                              type="button"
-                              onClick={() => handleExcluirMembro(usuario.id)}
-                              className="text-xs font-semibold py-0.5 px-2 rounded-2xl bg-red-100 text-red-500 hover:text-red-700 p-1 cursor-pointer transition-colors"
-                              title="Remover membro"
-                            >
-                              Excluir
-                            </button>
-                          )}
+                          {eUsuarioLogadoAdmin &&
+                            usuario.id !== usuarioLogadoId && (
+                              <button
+                                type="button"
+                                onClick={() => handleExcluirMembro(usuario.id)}
+                                className="text-xs font-semibold py-0.5 px-2 rounded-2xl bg-red-100 text-red-500 hover:text-red-700 p-1 cursor-pointer transition-colors"
+                                title="Remover membro"
+                              >
+                                Excluir
+                              </button>
+                            )}
                         </div>
                       </div>
                     </div>
                   );
                 })}
 
-                <div className="flex items-center justify-between p-4">
-                  <div className="w-full flex flex-row justify-between items-center">
-                    <div className="flex flex-row items-center gap-3">
-                      <div className="flex items-center justify-center bg-slate-100 w-10 h-10 rounded-full">
-                        <p className="text-lg font-bold text-slate-500">+</p>
+                {eUsuarioLogadoAdmin && (
+                  <div className="flex items-center justify-between p-4">
+                    <div className="w-full flex flex-row justify-between items-center">
+                      <div className="flex flex-row items-center gap-3">
+                        <div className="flex items-center justify-center bg-slate-100 w-10 h-10 rounded-full">
+                          <p className="text-lg font-bold text-slate-500">+</p>
+                        </div>
+
+                        <div className="flex flex-col justify-center items-start">
+                          <p className="text-sm font-semibold text-slate-400">
+                            Convidar membro
+                          </p>
+                          <p className="text-xs text-slate-300 uppercase font-medium">
+                            {vagasDisponiveis > 0
+                              ? `Mais ${vagasDisponiveis} ${vagasDisponiveis === 1 ? "vaga disponível" : "vagas disponíveis"}`
+                              : "Limite de vagas atingido"}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="flex flex-col justify-center items-start">
-                        <p className="text-sm font-semibold text-slate-400">
-                          Convidar membro
-                        </p>
-                        <p className="text-xs text-slate-300 uppercase font-medium">
-                          {vagasDisponiveis > 0
-                            ? `Mais ${vagasDisponiveis} ${vagasDisponiveis === 1 ? "vaga disponível" : "vagas disponíveis"}`
-                            : "Limite de vagas atingido"}
-                        </p>
+                      <div className="bg-white border border-slate-300 py-1.5 px-3 rounded-xl">
+                        <button
+                          type="button"
+                          disabled={vagasDisponiveis <= 0}
+                          onClick={() => setModalAberto(true)}
+                          className="text-xs font-semibold text-slate-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Convidar
+                        </button>
                       </div>
-                    </div>
-
-                    <div className="bg-white border border-slate-300 py-1.5 px-3 rounded-xl">
-                      <button
-                        type="button"
-                        disabled={vagasDisponiveis <= 0}
-                        onClick={() => setModalAberto(true)}
-                        className="text-xs font-semibold text-slate-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Convidar
-                      </button>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </>
