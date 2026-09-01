@@ -20,12 +20,14 @@ export interface Movimentacao {
   quantidade: number;
   motivo: string | null;
   preco: number | null;
+  observacao: string | null;
   criado: string;
   produto: {
     id: number;
     codigo: number;
     nome: string;
-    categoriaId: number;
+    descricao: string | null;
+    categoria: { id: number; nome: string };
   };
 }
 
@@ -58,4 +60,16 @@ export interface Usuario {
   nome: string;
   email?: string;
   role?: Role;
+}
+
+export interface DetalhesMovimentacaoProps {
+  movimentacao: Movimentacao | null;
+  onClose: () => void;
+}
+
+export interface TokenPayload {
+  id?: number;
+  name?: string;
+  email?: string;
+  exp?: number;
 }
