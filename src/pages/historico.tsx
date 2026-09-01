@@ -7,12 +7,15 @@ import toast, { Toaster } from "react-hot-toast";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import BottomNav from "../components/BottomNav";
+import DetalhesMovimentacao from "../components/DetalhesMovimentacao";
 
 export default function HistoricoPage() {
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [carregando, setCarregando] = useState<boolean>(true);
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState<"TODOS" | "ENTRADA" | "SAIDA">("TODOS");
+  const [movimentacaoSelecionada, setMovimentacaoSelecionada] =
+    useState<Movimentacao | null>(null);
 
   useEffect(() => {
     let ativo = true;
@@ -193,6 +196,7 @@ export default function HistoricoPage() {
                           return (
                             <div
                               key={mov.id}
+                              onClick={() => setMovimentacaoSelecionada(mov)}
                               className="flex items-center justify-between p-4 px-6 hover:bg-slate-50/50 transition cursor-pointer"
                             >
                               <div className="flex items-center gap-3 text-left">
@@ -275,6 +279,10 @@ export default function HistoricoPage() {
           </div>
         </div>
       </main>
+      <DetalhesMovimentacao
+        movimentacao={movimentacaoSelecionada}
+        onClose={() => setMovimentacaoSelecionada(null)}
+      />
       <BottomNav />
       <Toaster />
     </div>
