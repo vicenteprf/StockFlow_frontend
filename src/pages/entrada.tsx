@@ -4,12 +4,8 @@ import { api } from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import Header from "../components/Header";
 import SubmitButton from "../components/SubmitBotao";
+import type { Produto } from "../types/index";
 import { formatarMoedaInput } from "../utils/formatters";
-
-interface Produto {
-  id: number;
-  nome: string;
-}
 
 export default function EntradaPage() {
   const [dados, setDados] = useState({
@@ -18,7 +14,7 @@ export default function EntradaPage() {
     unidade: "unid",
     validade: "",
     preco: "",
-    fornecedor: "",
+    observacao: "",
   });
 
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -104,6 +100,7 @@ export default function EntradaPage() {
         tipo: "ENTRADA",
         preco: precoNumerico > 0 ? precoNumerico : undefined,
         validade: dados.validade.trim() ? dados.validade : undefined,
+        observacao: dados.observacao.trim() ? dados.observacao : undefined,
       };
 
       await api.post("/movimentacao", payload);
@@ -115,7 +112,7 @@ export default function EntradaPage() {
         unidade: "unid",
         validade: "",
         preco: "",
-        fornecedor: "",
+        observacao: "",
       });
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -238,9 +235,9 @@ export default function EntradaPage() {
 
               <input
                 type="text"
-                name="fornecedor"
+                name="observacao"
                 onChange={handleOnChange}
-                value={dados.fornecedor}
+                value={dados.observacao}
                 placeholder="Nome do fornecedor"
                 className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
               />
