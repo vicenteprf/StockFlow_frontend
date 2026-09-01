@@ -6,16 +6,10 @@ import BottomNav from "../components/BottomNav";
 import type { Categoria, Movimentacao, Usuario } from "../types";
 import toast, { Toaster } from "react-hot-toast";
 import { FiLoader } from "react-icons/fi";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-
-function formatarMesAno(chaveMesAno: string) {
-  const data = parseISO(`${chaveMesAno}-01`);
-
-  const textoFormatado = format(data, "MMMM yyyy", { locale: ptBR });
-
-  return textoFormatado.charAt(0).toUpperCase() + textoFormatado.slice(1);
-}
+import { formatarMesAno } from "../utils/formatters";
+import { parseJwtToken } from "../utils/auth";
 
 export default function DashboardPage() {
   const [equipe, setEquipe] = useState<Usuario[]>([]);
@@ -227,7 +221,7 @@ export default function DashboardPage() {
   const categoriasGastoMap = movimentacoesFiltradas
     .filter((mov) => mov.tipo === "ENTRADA")
     .reduce((acc, mov) => {
-      const categoriaId = mov.produto?.categoriaId;
+      const categoriaId = mov.produto?.categoria.id;
 
       const nomeCategoria =
         (categoriaId ? categoriaMap.get(categoriaId) : null) || "Sem categoria";
@@ -251,17 +245,7 @@ export default function DashboardPage() {
     .sort((a, b) => b.valor - a.valor);
 
   const token = localStorage.getItem("token");
-  let usuarioLogadoId: number | null = null;
-
-  if (token) {
-    try {
-      const payloadBase64 = token.split(".")[1];
-      const payloadDecodificado = JSON.parse(atob(payloadBase64));
-      usuarioLogadoId = payloadDecodificado.id;
-    } catch (e) {
-      console.error("Erro ao decodificar token:", e);
-    }
-  }
+  const usuarioLogadoId = parseJwtToken(token)?.id ?? null;
 
   const usuarioLogado = equipe.find((u) => u.id === usuarioLogadoId);
   const eUsuarioLogadoAdmin = usuarioLogado?.role === "ADMIN";

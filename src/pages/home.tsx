@@ -14,72 +14,24 @@ import {
 } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 import BottomNav from "../components/BottomNav";
+import DetalheMovimentacao from "../components/DetalhesMovimentacao.tsx";
 import type { Produto, Movimentacao } from "../types/index.ts";
 import {
   startOfDay,
   parseISO,
-  format,
   differenceInDays,
-  isToday,
-  isYesterday,
   subDays,
   isAfter,
 } from "date-fns";
-import { ptBR } from "date-fns/locale";
-
-function formatarDataMovimentacao(dataIso?: string | null) {
-  if (!dataIso) return "";
-
-  const data = parseISO(dataIso);
-  const horario = format(data, "HH:mm");
-
-  if (isToday(data)) {
-    return `hoje, ${horario}`;
-  }
-
-  if (isYesterday(data)) {
-    return `ontem, ${horario}`;
-  }
-
-  return `${format(data, "dd/MM/yyyy", { locale: ptBR })}, ${horario}`;
-}
-
-function getSaudacao(): string {
-  const hora = new Date().getHours();
-
-  if (hora >= 5 && hora < 12) return "Bom dia";
-  if (hora >= 12 && hora < 18) return "Boa tarde";
-  return "Boa noite";
-}
-
-function getUsuarioDoToken() {
-  const token = localStorage.getItem("token");
-  if (!token) return { nome: "Usuario", inicial: "U" };
-
-  try {
-    const payloadBase64 = token.split(".")[1];
-    const payloadDecodificado = JSON.parse(atob(payloadBase64));
-
-    const nomeCompleto = payloadDecodificado.name || "Usuário";
-    const primeiroNome = nomeCompleto.split(" ")[0];
-
-    const partesNome = nomeCompleto.trim().split(" ");
-    const inicial =
-      partesNome.length > 1
-        ? `${partesNome[0][0]}${partesNome[1][0]}`.toUpperCase()
-        : partesNome[0].substring(0, 2).toUpperCase();
-
-    return { nome: primeiroNome, inicial };
-  } catch (e) {
-    console.error("Erro ao decodificar token JWT:", e);
-    return { nome: "Usuário", inicial: "U" };
-  }
-}
+import { formatarDataMovimentacao, getSaudacao } from "../utils/formatters.ts";
+import { getUsuarioDoToken } from "../utils/auth.ts";
 
 export default function HomePage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [carregando, setCarregando] = useState<boolean>(true);
+  const [movimentacaoSelecionada, setMovimentacaoSelecionada] =
+    useState<Movimentacao | null>(null);
 
   const navigate = useNavigate();
 
@@ -354,7 +306,8 @@ export default function HomePage() {
                   return (
                     <div
                       key={mov.id}
-                      className="flex items-center justify-between p-4"
+                      onClick={() => setMovimentacaoSelecionada(mov)}
+                      className="flex items-center justify-between p-4 cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
                         <div
@@ -401,6 +354,10 @@ export default function HomePage() {
           </>
         )}
       </main>
+      <DetalheMovimentacao
+        movimentacao={movimentacaoSelecionada}
+        onClose={() => setMovimentacaoSelecionada(null)}
+      />
       <BottomNav />
       <Toaster />
     </div>
