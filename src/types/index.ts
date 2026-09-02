@@ -73,3 +73,8 @@ export interface TokenPayload {
   email?: string;
   exp?: number;
 }
+
+export interface ModalConviteProps {
+  onClose: () => void;
+  onSucesso: () => void;
+}
