@@ -5,17 +5,20 @@ export default function ModalDetalhesMovimentacao({
   movimentacao,
   onClose,
 }: DetalhesMovimentacaoProps) {
-  if (!movimentacao || movimentacao.tipo !== "ENTRADA") return null;
+  if (!movimentacao) return null;
 
-  const { produto, quantidade, preco, criado, observacao } = movimentacao;
+  const { produto, quantidade, preco, criado, observacao, tipo, motivo } =
+    movimentacao;
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl flex flex-col gap-4 relative animate-fade-in">
         <div className="flex justify-between items-start border-b border-slate-100 pb-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
-              Entrada
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${tipo === "ENTRADA" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}
+            >
+              {tipo === "ENTRADA" ? "Entrada" : "Saida"}
             </span>
             <h3 className="text-lg font-bold text-slate-800 mt-1">
               {produto?.nome || "Produto sem nome"}
@@ -75,10 +78,14 @@ export default function ModalDetalhesMovimentacao({
 
           <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 col-span-2">
             <p className="text-[10px] text-slate-400 uppercase font-semibold">
-              Fornecedor
+              {tipo === "ENTRADA" ? "Fornecedor" : "Motivo"}
             </p>
             <p className="font-medium text-slate-700">
-              {observacao || "Não informado"}
+              {tipo === "ENTRADA"
+                ? observacao
+                  ? observacao
+                  : "Sem informação"
+                : motivo}
             </p>
           </div>
 
