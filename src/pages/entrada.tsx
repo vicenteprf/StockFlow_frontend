@@ -156,6 +156,7 @@ export default function EntradaPage() {
                 {produtos.map((prod) => (
                   <option key={prod.id} value={prod.id}>
                     {prod.nome}
+                    {prod.descricao ? ` - ${prod.descricao}` : ""}
                   </option>
                 ))}
               </select>
