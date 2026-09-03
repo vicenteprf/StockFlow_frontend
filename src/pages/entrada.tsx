@@ -208,7 +208,7 @@ export default function EntradaPage() {
                 name="validade"
                 onChange={handleOnChange}
                 value={dados.validade}
-                className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                className="w-full appearance-none rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition [&::-webkit-calendar-picker-indicator]:cursor-pointer"
               />
             </div>
 
