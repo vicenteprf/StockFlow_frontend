@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Private } from "./components/ProtectedRoute.tsx";
 import LoginPage from "./pages/login.tsx";
+import EsqueceuSenhaPage from "./pages/esqueceuSenha.tsx";
+import RedefinirSenhaPage from "./pages/redefinirSenha.tsx";
 import CadastroPage from "./pages/cadastro.tsx";
 import { AuthCallback } from "./pages/authCallback.tsx";
 import HomePage from "./pages/home.tsx";
@@ -18,6 +20,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/cadastro" element={<CadastroPage />} />
+        <Route path="/esqueceu-senha" element={<EsqueceuSenhaPage />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenhaPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route element={<Private />}>
           <Route path="/home" element={<HomePage />} />
