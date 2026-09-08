@@ -136,7 +136,7 @@ export default function EntradaPage() {
             validade: item.validade.trim() ? item.validade : undefined,
           };
         }),
-        observacao: observacao.trim() ? observacao : undefined,
+        observacao: observacao.trim(),
       };
 
       await api.post("/movimentacao/entrada", payload);

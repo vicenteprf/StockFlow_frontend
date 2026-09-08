@@ -67,6 +67,11 @@ export interface DetalhesMovimentacaoProps {
   onClose: () => void;
 }
 
+export interface DetalhesEstoqueProps {
+  produto: Produto | null;
+  onClose: () => void;
+}
+
 export interface TokenPayload {
   id?: number;
   name?: string;

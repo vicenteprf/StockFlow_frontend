@@ -14,10 +14,10 @@ export function formatarMoedaInput(value: string) {
   }).format(valorNumerico);
 }
 
-export function formatarValidade(validade?: string | Date) {
+export function formatarValidade(validade?: string | Date | null) {
   if (!validade) return "Val: N/A";
   const data = new Date(validade);
-  return `Val: ${data.toLocaleDateString("pt-BR")}`;
+  return ` ${data.toLocaleDateString("pt-BR")}`;
 }
 
 export function formatarDataExtensa(data?: string | Date | null) {
