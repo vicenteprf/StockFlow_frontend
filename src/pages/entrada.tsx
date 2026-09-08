@@ -4,19 +4,21 @@ import { api } from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import Header from "../components/Header";
 import SubmitButton from "../components/SubmitBotao";
-import type { Produto } from "../types/index";
-import { formatarMoedaInput } from "../utils/formatters";
+import type { Produto, ItemEntrada } from "../types/index";
+import { formatarMoedaInput, formatarMoeda } from "../utils/formatters";
+import { FiTrash2 } from "react-icons/fi";
 
 export default function EntradaPage() {
-  const [dados, setDados] = useState({
-    produtoId: "",
-    quantidade: "",
-    unidade: "unid",
-    validade: "",
-    preco: "",
-    observacao: "",
-  });
-
+  const [itens, setItens] = useState<ItemEntrada[]>([
+    {
+      produtoId: "",
+      quantidade: "1",
+      unidade: "unid",
+      validade: "",
+      preco: "",
+    },
+  ]);
+  const [observacao, setObservacao] = useState("");
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -44,233 +46,274 @@ export default function EntradaPage() {
     };
   }, []);
 
-  function handleOnChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  function handleItemChange(
+    index: number,
+    field: keyof ItemEntrada,
+    value: string,
   ) {
-    const { name, value } = e.target;
+    setItens((prev) => {
+      const novosItens = [...prev];
+      let val = value;
 
-    if (name === "preco") {
-      setDados((prev) => ({
-        ...prev,
-        preco: formatarMoedaInput(value),
-      }));
-      return;
-    }
+      if (field === "preco") {
+        val = formatarMoedaInput(value);
+      } else if (field === "quantidade") {
+        val = value.replace(/\D/g, "");
+      }
 
-    if (name === "quantidade") {
-      const apenasNumeros = value.replace(/\D/g, "");
-      setDados((prev) => ({
-        ...prev,
-        quantidade: apenasNumeros,
-      }));
-      return;
-    }
+      novosItens[index] = {
+        ...novosItens[index],
+        [field]: val,
+      };
 
-    setDados((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+      return novosItens;
+    });
   }
 
-  const quantidade = Number(dados.quantidade) || 0;
-  const precoNumerico = Number(dados.preco.replace(/\D/g, "")) / 100 || 0;
+  function adicionarItem() {
+    setItens((prev) => [
+      ...prev,
+      {
+        produtoId: "",
+        quantidade: "1",
+        unidade: "unid",
+        validade: "",
+        preco: "",
+      },
+    ]);
+  }
 
-  const valorTotal = new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(quantidade * precoNumerico);
+  function removerItem(index: number) {
+    if (itens.length === 1) {
+      toast.error("A entrada precisa ter ao menos 1 item.");
+      return;
+    }
+    setItens((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  const calcularSubtotal = (item: ItemEntrada) => {
+    const qtd = Number(item.quantidade) || 0;
+    const precoNum = Number(item.preco.replace(/\D/g, "")) / 100 || 0;
+    return qtd * precoNum;
+  };
+
+  const valorTotalGeral = itens.reduce(
+    (acc, item) => acc + calcularSubtotal(item),
+    0,
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!dados.produtoId.trim() || !dados.quantidade.trim()) {
-      toast.error("Selecione o produto e informe a quantidade.");
-      return;
-    }
-
-    if (Number(dados.quantidade) <= 0) {
-      toast.error("A quantidade deve ser maior que zero.");
-      return;
+    for (let i = 0; i < itens.length; i++) {
+      const item = itens[i];
+      if (!item.produtoId) {
+        toast.error(`Selecione um produto para o Item ${i + 1}.`);
+        return;
+      }
+      if (!item.quantidade || Number(item.quantidade) <= 0) {
+        toast.error(`Informe uma quantidade válida para o Item ${i + 1}.`);
+        return;
+      }
     }
 
     try {
       const payload = {
-        produtoId: Number(dados.produtoId),
-        quantidade: Number(dados.quantidade),
-        tipo: "ENTRADA",
-        preco: precoNumerico > 0 ? precoNumerico : undefined,
-        validade: dados.validade.trim() ? dados.validade : undefined,
-        observacao: dados.observacao.trim() ? dados.observacao : undefined,
+        itens: itens.map((item) => {
+          const precoNumerico =
+            Number(item.preco.replace(/\D/g, "")) / 100 || 0;
+
+          return {
+            produtoId: Number(item.produtoId),
+            quantidade: Number(item.quantidade),
+            unidade: item.unidade,
+            preco: precoNumerico > 0 ? precoNumerico : undefined,
+            validade: item.validade.trim() ? item.validade : undefined,
+          };
+        }),
+        observacao: observacao.trim() ? observacao : undefined,
       };
 
-      await api.post("/movimentacao", payload);
-      toast.success("Entrada registrada com sucesso!");
+      await api.post("/movimentacao/entrada", payload);
+      toast.success("Entrada em lote registrada com sucesso!");
 
-      setDados({
-        produtoId: "",
-        quantidade: "",
-        unidade: "unid",
-        validade: "",
-        preco: "",
-        observacao: "",
-      });
+      setItens([
+        {
+          produtoId: "",
+          quantidade: "1",
+          unidade: "unid",
+          validade: "",
+          preco: "",
+        },
+      ]);
+      setObservacao("");
     } catch (e) {
       if (axios.isAxiosError(e)) {
         const apiMessage = e.response?.data?.message;
-
-        const errorMessage =
+        toast.error(
           typeof apiMessage === "string"
             ? apiMessage
-            : "Erro ao cadastrar o produto. Verifique os dados.";
-
-        toast.error(errorMessage);
-        return;
+            : "Erro ao registrar entrada.",
+        );
       }
     }
   }
+
   return (
     <div>
       <Header texto="Registrar entrada" />
       <main className="min-h-screen bg-[#f4f7fc] flex flex-col items-center justify-center gap-6 px-4 py-8">
-        <div className="w-full max-w-sm bg-white border border-slate-200/80 rounded-3xl shadow-sm flex flex-col items-center text-center overflow-hidden">
+        <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl shadow-sm flex flex-col items-center overflow-hidden">
           <form
             onSubmit={handleSubmit}
             className="w-full text-left space-y-4 bg-blue-50/90 p-6"
           >
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                Produto
-                <span className="text-slate-400 text-xs">- nome ou código</span>
-              </label>
-
-              <select
-                name="produtoId"
-                value={dados.produtoId}
-                onChange={handleOnChange}
-                disabled={loading}
-                className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+            {itens.map((item, index) => (
+              <div
+                key={index}
+                className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3 relative"
               >
-                <option value="">
-                  {loading ? "Carregando produtos..." : "Selecione um produto"}
-                </option>
-                {produtos.map((prod) => (
-                  <option key={prod.id} value={prod.id}>
-                    {prod.nome}
-                    {prod.descricao ? ` - ${prod.descricao}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-slate-700">
+                    Item {index + 1}
+                  </span>
+                  {itens.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removerItem(index)}
+                      className="text-red-500 hover:text-red-700 text-sm font-semibold cursor-pointer"
+                      title="Remover Item"
+                    >
+                      <FiTrash2 size={18} />
+                    </button>
+                  )}
+                </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                  Quantidade
-                </label>
+                <div>
+                  <select
+                    value={item.produtoId}
+                    onChange={(e) =>
+                      handleItemChange(index, "produtoId", e.target.value)
+                    }
+                    disabled={loading}
+                    className="w-full rounded-xl bg-white border border-slate-200 px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-500 transition"
+                  >
+                    <option value="">
+                      {loading
+                        ? "Carregando produtos..."
+                        : "Selecione um produto"}
+                    </option>
+                    {produtos.map((prod) => (
+                      <option key={prod.id} value={prod.id}>
+                        {prod.nome}
+                        {prod.descricao ? ` - ${prod.descricao}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                <input
-                  type="number"
-                  name="quantidade"
-                  min="1"
-                  onChange={handleOnChange}
-                  value={dados.quantidade}
-                  placeholder="10"
-                  className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1 ">
+                      Qtd.
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.quantidade}
+                      onChange={(e) =>
+                        handleItemChange(index, "quantidade", e.target.value)
+                      }
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                      Valor unit.
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="R$ 0,00"
+                      value={item.preco}
+                      onChange={(e) =>
+                        handleItemChange(index, "preco", e.target.value)
+                      }
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                      Validade
+                    </label>
+                    <input
+                      type="date"
+                      value={item.validade}
+                      onChange={(e) =>
+                        handleItemChange(index, "validade", e.target.value)
+                      }
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1 ">
+                      Unidade
+                    </label>
+                    <select
+                      value={item.unidade}
+                      onChange={(e) =>
+                        handleItemChange(index, "unidade", e.target.value)
+                      }
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 cursor-pointer"
+                    >
+                      <option value="unid">unid</option>
+                      <option value="pacote">pacote</option>
+                      <option value="kg">kg</option>
+                      <option value="Litro">Litro</option>
+                      <option value="caixa">caixa</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="text-right text-xs text-slate-500 font-medium pt-1">
+                  Subtotal:{" "}
+                  <span className="font-bold text-slate-800">
+                    {formatarMoeda(calcularSubtotal(item))}
+                  </span>
+                </div>
               </div>
+            ))}
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                  Unidade
-                </label>
-
-                <select
-                  name="unidade"
-                  onChange={handleOnChange}
-                  value={dados.unidade}
-                  className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-                >
-                  <option>unid</option>
-                  <option>pacote</option>
-                  <option>kg</option>
-                  <option>Litro</option>
-                  <option>caixa</option>
-                </select>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={adicionarItem}
+              className="w-full py-2.5 bg-white border border-dashed border-blue-400 hover:border-blue-600 text-blue-600 font-semibold rounded-xl text-sm transition cursor-pointer shadow-sm"
+            >
+              + Adicionar produto
+            </button>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                Validade
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                Fornecedor <span className="text-slate-400">(opcional)</span>
               </label>
-
-              <input
-                type="date"
-                name="validade"
-                onChange={handleOnChange}
-                value={dados.validade}
-                className="w-full appearance-none rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                Valor unitário (R$)
-              </label>
-
               <input
                 type="text"
-                name="preco"
-                onChange={handleOnChange}
-                value={dados.preco}
-                placeholder="R$ 0,00"
-                className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                Fornecedor{" "}
-                <span className="text-slate-400 text-xs">(opcional)</span>
-              </label>
-
-              <input
-                type="text"
-                name="observacao"
-                onChange={handleOnChange}
-                value={dados.observacao}
+                value={observacao}
+                onChange={(e) => setObservacao(e.target.value)}
                 placeholder="Nome do fornecedor"
-                className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                className="w-full rounded-xl bg-white border border-slate-200 px-3.5 py-2 text-sm text-slate-800 outline-none focus:border-blue-500"
               />
             </div>
 
-            <div className="flex items-center justify-between rounded-2xl bg-slate-200/50 p-4 border border-slate-200/60">
-              <span className="text-sm font-medium text-slate-600">
-                Valor total desta entrada
+            <div className="flex items-center justify-between rounded-2xl bg-blue-600 p-4 text-white">
+              <span className="text-sm font-medium">Total da entrada</span>
+              <span className="text-xl font-bold">
+                {formatarMoeda(valorTotalGeral)}
               </span>
-              <span className="text-lg font-bold text-blue-600">
-                {valorTotal}
-              </span>
-            </div>
-
-            <div className="flex items-start gap-2.5 rounded-2xl bg-blue-50/80 p-3.5 border border-blue-100 text-blue-600">
-              <svg
-                className="w-5 h-5 shrink-0 mt-0.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 16v-4m0-4h.01"
-                />
-              </svg>
-              <p className="text-xs font-medium leading-relaxed">
-                Esta entrada será registrada no histórico com data e hora.
-              </p>
             </div>
 
             <SubmitButton>Confirmar entrada</SubmitButton>
