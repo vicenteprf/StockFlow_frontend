@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import type { Produto, Categoria } from "../types";
 import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
 import BottomNav from "../components/BottomNav";
+import ModalDetalhesEstoque from "../components/ModalDetalhesEstoque";
 
 export default function EstoquePage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -15,6 +16,9 @@ export default function EstoquePage() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<
     number | null
   >(null);
+  const [estoqueSelecionado, setEstoqueSelecionado] = useState<Produto | null>(
+    null,
+  );
 
   useEffect(() => {
     let ativo = true;
@@ -170,6 +174,7 @@ export default function EstoquePage() {
                   return (
                     <div
                       key={prod.id}
+                      onClick={() => setEstoqueSelecionado(prod)}
                       className={`flex items-center justify-between p-4 px-6 hover:bg-slate-50/60 transition cursor-pointer relative ${
                         status === "A_VENCER"
                           ? "bg-amber-50/40 border-l-4 border-l-amber-500"
@@ -270,6 +275,10 @@ export default function EstoquePage() {
           </div>
         </div>
       </main>
+      <ModalDetalhesEstoque
+        produto={estoqueSelecionado}
+        onClose={() => setEstoqueSelecionado(null)}
+      />
       <BottomNav />
       <Toaster />
     </div>
