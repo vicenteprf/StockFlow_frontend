@@ -78,3 +78,11 @@ export interface ModalConviteProps {
   onClose: () => void;
   onSucesso: () => void;
 }
+
+export interface ItemEntrada {
+  produtoId: string;
+  quantidade: string;
+  unidade: string;
+  validade: string;
+  preco: string;
+}
