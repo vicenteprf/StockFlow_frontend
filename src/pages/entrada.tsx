@@ -29,7 +29,12 @@ export default function EntradaPage() {
       try {
         const response = await api.get("/produto");
         if (ativo && response.data) {
-          setProdutos(response.data);
+          const produtosOrdenados = response.data.sort(
+            (a: Produto, b: Produto) =>
+              a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }),
+          );
+
+          setProdutos(produtosOrdenados);
         }
       } catch (e) {
         console.error("Erro ao carregar produtos:", e);

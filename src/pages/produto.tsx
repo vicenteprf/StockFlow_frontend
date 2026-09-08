@@ -24,7 +24,12 @@ export default function ProdutoPage() {
       try {
         const response = await api.get("/categoria");
         if (ativo && response.data) {
-          setCategoria(response.data);
+          const categoriaOrdenada = response.data.sort(
+            (a: Categoria, b: Categoria) =>
+              a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }),
+          );
+
+          setCategoria(categoriaOrdenada);
         }
       } catch (e) {
         console.error("Erro ao carregar categorias:", e);
