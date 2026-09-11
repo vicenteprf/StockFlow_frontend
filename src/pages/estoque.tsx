@@ -33,7 +33,14 @@ export default function EstoquePage() {
 
         if (ativo) {
           if (resCategorias.data) setCategorias(resCategorias.data);
-          if (resProdutos.data) setProdutos(resProdutos.data);
+          if (resProdutos.data) {
+            const produtosOrdenados = resProdutos.data.sort(
+              (a: Produto, b: Produto) =>
+                a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }),
+            );
+
+            setProdutos(produtosOrdenados);
+          }
         }
       } catch (e) {
         console.error("Erro ao carregar dados:", e);
@@ -52,7 +59,9 @@ export default function EstoquePage() {
 
   function getQtdProdutosPorCategoria(catId: number) {
     return produtos.filter(
-      (p) => p.categoriaId === catId || p.categoria?.id === catId,
+      (p) =>
+        (p.categoriaId === catId || p.categoria?.id === catId) &&
+        (p.quantidadeEstoque || 0) > 0,
     ).length;
   }
 
@@ -90,7 +99,9 @@ export default function EstoquePage() {
       String(prod.codigo).includes(termo) ||
       codigoFormatado.includes(termo);
 
-    return atendeCategoria && atendeBusca;
+    const atendeEstoque = (prod.quantidadeEstoque || 0) > 0;
+
+    return atendeCategoria && atendeBusca && atendeEstoque;
   });
 
   return (
@@ -124,7 +135,12 @@ export default function EstoquePage() {
                       : "bg-slate-100/80 font-medium text-slate-500 hover:bg-blue-200/60 hover:text-blue-600"
                   }`}
                 >
-                  Todos ({produtos.length})
+                  Todos (
+                  {
+                    produtos.filter((p) => (p.quantidadeEstoque || 0) > 0)
+                      .length
+                  }
+                  )
                 </button>
                 {categorias.map((cat) => {
                   const total = getQtdProdutosPorCategoria(cat.id);
