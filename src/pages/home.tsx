@@ -84,7 +84,7 @@ export default function HomePage() {
     const dataValidade = startOfDay(parseISO(prod.validade));
     const diasAteVencer = differenceInDays(dataValidade, hoje);
 
-    return diasAteVencer >= 0 && diasAteVencer <= 15;
+    return diasAteVencer > 0 && diasAteVencer <= 15;
   });
 
   const produtosVencidos = produtos.filter((prod) => {
@@ -93,10 +93,12 @@ export default function HomePage() {
     const dataValidade = startOfDay(parseISO(prod.validade));
     const diasAteVencer = differenceInDays(dataValidade, hoje);
 
-    return diasAteVencer < 0;
+    return diasAteVencer <= 0;
   });
 
   const totalVencendo = produtosVencendo.length;
+  const totalVencidos = produtosVencidos.length;
+  const alertaValidade = totalVencendo + totalVencidos;
 
   const ultimasMovimentacoes = movimentacoes.slice(0, 3);
 
@@ -192,7 +194,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {totalVencendo > 0 && (
+            {alertaValidade > 0 && (
               <div className="w-full bg-amber-50/70 border border-amber-200/80 p-4 rounded-2xl flex items-center gap-3">
                 <FiAlertTriangle
                   size={20}
@@ -200,10 +202,10 @@ export default function HomePage() {
                 />
                 <p className="text-amber-800 text-xs leading-relaxed">
                   <span className="text-amber-700 font-bold">
-                    {totalVencendo}{" "}
-                    {totalVencendo === 1 ? "produto" : "produtos"}
+                    {alertaValidade}{" "}
+                    {alertaValidade === 1 ? "produto" : "produtos"}
                   </span>{" "}
-                  com validade próxima ao vencimento.{" "}
+                  com validade próxima ao vencimento ou vencido.{" "}
                   <button
                     className="cursor-pointer hover:underline"
                     onClick={() => setModalValidadeAberto(true)}
