@@ -260,7 +260,7 @@ export default function EntradaPage() {
                       onChange={(e) =>
                         handleItemChange(index, "validade", e.target.value)
                       }
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                      className="w-full appearance-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
                     />
                   </div>
 
