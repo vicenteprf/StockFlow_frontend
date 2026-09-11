@@ -56,7 +56,8 @@ export default function ModalValidade({
           ) : (
             <div className="w-full flex flex-col gap-2 pt-2 border-t border-slate-100">
               {filtroProdutos.map((prod) => {
-                if (!prod.validade) return null;
+                if (!prod.validade || (prod.quantidadeEstoque || 0) <= 0)
+                  return null;
 
                 const hoje = startOfDay(new Date());
                 const dataValidade = startOfDay(parseISO(prod.validade));

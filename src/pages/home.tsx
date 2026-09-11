@@ -79,7 +79,7 @@ export default function HomePage() {
   const hoje = startOfDay(new Date());
 
   const produtosVencendo = produtos.filter((prod) => {
-    if (!prod.validade) return false;
+    if (!prod.validade || (prod.quantidadeEstoque || 0) <= 0) return false;
 
     const dataValidade = startOfDay(parseISO(prod.validade));
     const diasAteVencer = differenceInDays(dataValidade, hoje);
@@ -88,7 +88,7 @@ export default function HomePage() {
   });
 
   const produtosVencidos = produtos.filter((prod) => {
-    if (!prod.validade) return false;
+    if (!prod.validade || (prod.quantidadeEstoque || 0) <= 0) return false;
 
     const dataValidade = startOfDay(parseISO(prod.validade));
     const diasAteVencer = differenceInDays(dataValidade, hoje);
