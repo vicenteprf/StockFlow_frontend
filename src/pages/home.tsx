@@ -15,6 +15,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import BottomNav from "../components/BottomNav";
 import DetalheMovimentacao from "../components/DetalhesMovimentacao.tsx";
+import ModalValidade from "../components/ModalValidade.tsx";
 import type { Produto, Movimentacao } from "../types/index.ts";
 import {
   startOfDay,
@@ -32,6 +33,7 @@ export default function HomePage() {
   const [carregando, setCarregando] = useState<boolean>(true);
   const [movimentacaoSelecionada, setMovimentacaoSelecionada] =
     useState<Movimentacao | null>(null);
+  const [modalValidadeAberto, setModalValidadeAberto] = useState(false);
 
   const navigate = useNavigate();
 
@@ -83,6 +85,15 @@ export default function HomePage() {
     const diasAteVencer = differenceInDays(dataValidade, hoje);
 
     return diasAteVencer >= 0 && diasAteVencer <= 15;
+  });
+
+  const produtosVencidos = produtos.filter((prod) => {
+    if (!prod.validade) return false;
+
+    const dataValidade = startOfDay(parseISO(prod.validade));
+    const diasAteVencer = differenceInDays(dataValidade, hoje);
+
+    return diasAteVencer < 0;
   });
 
   const totalVencendo = produtosVencendo.length;
@@ -192,7 +203,13 @@ export default function HomePage() {
                     {totalVencendo}{" "}
                     {totalVencendo === 1 ? "produto" : "produtos"}
                   </span>{" "}
-                  com validade próxima ao vencimento.
+                  com validade próxima ao vencimento.{" "}
+                  <button
+                    className="cursor-pointer hover:underline"
+                    onClick={() => setModalValidadeAberto(true)}
+                  >
+                    Ver mais
+                  </button>
                 </p>
               </div>
             )}
@@ -354,10 +371,21 @@ export default function HomePage() {
           </>
         )}
       </main>
+
+      {modalValidadeAberto && (
+        <ModalValidade
+          produtosVencendo={produtosVencendo}
+          produtosVencido={produtosVencidos}
+          movimentacoes={movimentacoes}
+          onClose={() => setModalValidadeAberto(false)}
+        />
+      )}
+
       <DetalheMovimentacao
         movimentacao={movimentacaoSelecionada}
         onClose={() => setMovimentacaoSelecionada(null)}
       />
+
       <BottomNav />
       <Toaster />
     </div>

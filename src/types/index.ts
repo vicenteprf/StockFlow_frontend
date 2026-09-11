@@ -72,6 +72,13 @@ export interface DetalhesEstoqueProps {
   onClose: () => void;
 }
 
+export interface DetalhesProdutosProps {
+  produtosVencendo: Produto[];
+  produtosVencido: Produto[];
+  movimentacoes: Movimentacao[];
+  onClose: () => void;
+}
+
 export interface TokenPayload {
   id?: number;
   name?: string;
@@ -91,3 +98,5 @@ export interface ItemEntrada {
   validade: string;
   preco: string;
 }
+
+export type Filtro = "Proximo do vencimento" | "vencido";
