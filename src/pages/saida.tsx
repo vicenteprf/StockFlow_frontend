@@ -16,6 +16,7 @@ export default function SaidaPage() {
 
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     let ativo = true;
@@ -93,6 +94,9 @@ export default function SaidaPage() {
       return;
     }
 
+    if (enviando) return;
+    setEnviando(true);
+
     try {
       const payload = {
         produtoId: Number(dados.produtoId),
@@ -135,6 +139,8 @@ export default function SaidaPage() {
         toast.error(errorMessage);
         return;
       }
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -267,7 +273,9 @@ export default function SaidaPage() {
               </p>
             </div>
 
-            <SubmitButton>Confirmar saída</SubmitButton>
+            <SubmitButton disabled={enviando}>
+              {enviando ? "Registrando" : "Confirmar saída"}
+            </SubmitButton>
           </form>
         </div>
       </main>

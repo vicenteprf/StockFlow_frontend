@@ -21,6 +21,7 @@ export default function EntradaPage() {
   const [observacao, setObservacao] = useState("");
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     let ativo = true;
@@ -122,6 +123,9 @@ export default function EntradaPage() {
       }
     }
 
+    if (enviando) return;
+    setEnviando(true);
+
     try {
       const payload = {
         itens: itens.map((item) => {
@@ -161,6 +165,8 @@ export default function EntradaPage() {
             : "Erro ao registrar entrada.",
         );
       }
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -321,7 +327,9 @@ export default function EntradaPage() {
               </span>
             </div>
 
-            <SubmitButton>Confirmar entrada</SubmitButton>
+            <SubmitButton disabled={enviando}>
+              {enviando ? "Registrando" : "Confirmar entrada"}
+            </SubmitButton>
           </form>
         </div>
       </main>
